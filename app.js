@@ -1,6 +1,6 @@
 /* === SUPABASE === */
 const SUPABASE_URL = 'https://ydetmjryjpnrpcmoxvre.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZXRtanJ5anBucnBjbW94dnJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2Nzk3NTcsImV4cCI6MjA3ODI1NTc1N30.P5aHR5ObmXF5g2Ov6_fWh-5YgYMXRcQs4LNIOgl0jnw'
+const SUPABASE_ANON_KEY = 'sb_publishable_uLl0hF0mVvqWHBHUZSMFEA_g-YtL6a9'
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
@@ -88,7 +88,7 @@ document.getElementById('loginSendBtn').addEventListener('click', async () => {
   const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } })
 
   if (error) {
-    errorEl.textContent = 'Не удалось отправить код. Проверь email.'
+    errorEl.textContent = error.message || 'Не удалось отправить код'
     btn.textContent = 'Получить код'
     btn.disabled = false
     return
@@ -221,7 +221,7 @@ document.getElementById('mobileSendBtn')?.addEventListener('click', async () => 
   btn.textContent = 'Отправка…'; btn.disabled = true; errorEl.textContent = ''
   const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } })
   if (error) {
-    errorEl.textContent = 'Не удалось отправить код'
+    errorEl.textContent = error.message || 'Не удалось отправить код'
     btn.textContent = 'Получить код'; btn.disabled = false; return
   }
   mobileOtpEmail = email
