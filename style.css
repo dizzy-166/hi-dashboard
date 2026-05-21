@@ -717,6 +717,49 @@ body {
 }
 .bc-date.muted { color: #555; }
 
+/* === SPLASH === */
+.splash {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  transition: opacity 0.6s ease;
+}
+.splash.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-logo {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  color: var(--text);
+  display: flex;
+  align-items: baseline;
+  line-height: 1;
+}
+
+.sl-dot { color: var(--accent); }
+
+.sl-expand {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 0;
+  white-space: nowrap;
+  transition: max-width 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transition: max-width 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.75s ease;
+}
+.sl-expand.open {
+  max-width: 320px;
+  opacity: 1;
+}
+
 /* === LOGIN OVERLAY === */
 .login-overlay {
   position: fixed;

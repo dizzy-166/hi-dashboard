@@ -18,12 +18,42 @@ async function openApp(baseUrl) {
   window.open(`${baseUrl}#${hash}`, '_blank')
 }
 
+/* === SPLASH === */
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+
+async function runSplash() {
+  const splash = document.getElementById('splash')
+  const se1 = document.getElementById('se1')
+  const se2 = document.getElementById('se2')
+
+  await sleep(500)
+
+  // Expand: hi. → health industry.
+  se1.classList.add('open')
+  se2.classList.add('open')
+  await sleep(750 + 1000) // transition + pause
+
+  // Contract: health industry. → hi.
+  se1.classList.remove('open')
+  se2.classList.remove('open')
+  await sleep(750 + 400) // transition + pause
+
+  // Fade out
+  splash.classList.add('fade-out')
+  await sleep(600)
+  splash.style.display = 'none'
+}
+
 /* === INIT === */
 async function init() {
   drawSparkline()
   drawArcs(0)
 
-  const { data: { session } } = await sb.auth.getSession()
+  const [{ data: { session } }] = await Promise.all([
+    sb.auth.getSession(),
+    runSplash(),
+  ])
+
   if (session) {
     await loadDashboard(session.user)
   } else {
