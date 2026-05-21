@@ -32,6 +32,12 @@
         <button class="login-btn" id="loginVerifyBtn" style="margin-top:12px">Войти</button>
         <button class="login-back" id="loginBackBtn">← другой email</button>
       </div>
+      <!-- Step 3: Username (новые пользователи) -->
+      <div id="loginStep3" style="display:none">
+        <p class="login-hint">Последний шаг — выбери имя пользователя</p>
+        <input type="text" id="loginUsername" class="login-input" placeholder="username" autocomplete="username" spellcheck="false" />
+        <button class="login-btn" id="loginCreateBtn" style="margin-top:12px">Создать аккаунт</button>
+      </div>
       <div class="login-error" id="loginError"></div>
     </div>
   </div>
@@ -54,6 +60,11 @@
         <input type="text" id="mobileOtp" class="login-input login-input--otp" placeholder="123456" maxlength="6" inputmode="numeric" autocomplete="one-time-code" />
         <button class="login-btn" id="mobileVerifyBtn">Войти</button>
         <button class="login-back" id="mobileBackBtn">← другой email</button>
+      </div>
+      <div class="mobile-auth-step" id="mobileStep3" style="display:none">
+        <p class="login-hint">Последний шаг — выбери имя пользователя</p>
+        <input type="text" id="mobileUsernameInput" class="login-input" placeholder="username" autocomplete="username" spellcheck="false" />
+        <button class="login-btn" id="mobileCreateBtn">Создать аккаунт</button>
       </div>
 
       <div class="login-error" id="mobileError"></div>

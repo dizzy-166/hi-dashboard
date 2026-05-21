@@ -85,7 +85,7 @@ document.getElementById('loginSendBtn').addEventListener('click', async () => {
   btn.disabled = true
   errorEl.textContent = ''
 
-  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } })
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } })
 
   if (error) {
     errorEl.textContent = 'Не удалось отправить код. Проверь email.'
@@ -126,12 +126,42 @@ document.getElementById('loginVerifyBtn').addEventListener('click', async () => 
   }
 
   const { data: { user } } = await sb.auth.getUser()
-  hideLogin()
-  await loadDashboard(user)
+  await handlePostAuth(user, {
+    onExisting: async () => { hideLogin(); await loadDashboard(user) },
+    onNew: () => {
+      document.getElementById('loginStep2').style.display = 'none'
+      document.getElementById('loginStep3').style.display = 'block'
+      document.getElementById('loginUsername').focus()
+    },
+  })
 })
 
 document.getElementById('loginOtp').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('loginVerifyBtn').click()
+})
+
+document.getElementById('loginCreateBtn').addEventListener('click', async () => {
+  const username = document.getElementById('loginUsername').value.trim().toLowerCase()
+  const errorEl = document.getElementById('loginError')
+  const btn = document.getElementById('loginCreateBtn')
+
+  if (!username || username.length < 3) { errorEl.textContent = 'Минимум 3 символа'; return }
+  if (!/^[a-z0-9_]+$/.test(username)) { errorEl.textContent = 'Только латиница, цифры и _'; return }
+
+  btn.textContent = 'Создание…'; btn.disabled = true; errorEl.textContent = ''
+
+  const { data: { user } } = await sb.auth.getUser()
+  const { error } = await createProfile(user, username)
+  if (error) {
+    errorEl.textContent = error.code === '23505' ? 'Имя занято, выбери другое' : 'Ошибка, попробуй снова'
+    btn.textContent = 'Создать аккаунт'; btn.disabled = false; return
+  }
+  hideLogin()
+  await loadDashboard(user)
+})
+
+document.getElementById('loginUsername').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loginCreateBtn').click()
 })
 
 document.getElementById('loginBackBtn').addEventListener('click', () => {
@@ -147,6 +177,17 @@ document.getElementById('navDoubleDo').addEventListener('click', e => {
   e.preventDefault()
   openApp(APPS.doubledo)
 })
+
+/* === REGISTRATION HELPERS === */
+async function handlePostAuth(user, { onExisting, onNew }) {
+  const { data: profile } = await sb.from('users').select('id').eq('id', user.id).maybeSingle()
+  if (profile) await onExisting()
+  else await onNew()
+}
+
+async function createProfile(user, username) {
+  return sb.from('users').insert({ id: user.id, email: user.email, username })
+}
 
 /* === MOBILE AUTH === */
 function isMobile() {
@@ -178,7 +219,7 @@ document.getElementById('mobileSendBtn')?.addEventListener('click', async () => 
   if (!email) { errorEl.textContent = 'Введи email'; return }
 
   btn.textContent = 'Отправка…'; btn.disabled = true; errorEl.textContent = ''
-  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } })
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } })
   if (error) {
     errorEl.textContent = 'Не удалось отправить код'
     btn.textContent = 'Получить код'; btn.disabled = false; return
@@ -203,6 +244,32 @@ document.getElementById('mobileVerifyBtn')?.addEventListener('click', async () =
     btn.textContent = 'Войти'; btn.disabled = false; return
   }
   const { data: { user } } = await sb.auth.getUser()
+  await handlePostAuth(user, {
+    onExisting: async () => showMobileLogged(user),
+    onNew: () => {
+      document.getElementById('mobileStep2').style.display = 'none'
+      document.getElementById('mobileStep3').style.display = 'flex'
+      document.getElementById('mobileUsernameInput').focus()
+    },
+  })
+})
+
+document.getElementById('mobileCreateBtn')?.addEventListener('click', async () => {
+  const username = document.getElementById('mobileUsernameInput').value.trim().toLowerCase()
+  const errorEl = document.getElementById('mobileError')
+  const btn = document.getElementById('mobileCreateBtn')
+
+  if (!username || username.length < 3) { errorEl.textContent = 'Минимум 3 символа'; return }
+  if (!/^[a-z0-9_]+$/.test(username)) { errorEl.textContent = 'Только латиница, цифры и _'; return }
+
+  btn.textContent = 'Создание…'; btn.disabled = true; errorEl.textContent = ''
+
+  const { data: { user } } = await sb.auth.getUser()
+  const { error } = await createProfile(user, username)
+  if (error) {
+    errorEl.textContent = error.code === '23505' ? 'Имя занято, выбери другое' : 'Ошибка'
+    btn.textContent = 'Создать аккаунт'; btn.disabled = false; return
+  }
   showMobileLogged(user)
 })
 
