@@ -837,6 +837,57 @@ body {
   .mobile-app-locked .mobile-app-name {
     color: var(--text-muted);
   }
+
+  .mobile-auth {
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mobile-auth-step {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mobile-pc-note {
+    font-size: 11px;
+    color: #BBB6AC;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .mobile-logged {
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mobile-user-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .mobile-username {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .mobile-logout {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #BBB6AC;
+    cursor: pointer;
+    padding: 0;
+  }
 }
 
 /* === SPLASH === */

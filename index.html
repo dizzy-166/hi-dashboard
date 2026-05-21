@@ -39,49 +39,76 @@
   <!-- MOBILE SCREEN -->
   <div class="mobile-screen">
     <div class="mobile-logo">hi<span class="dot">.</span></div>
-    <p class="mobile-title">Дашборд работает<br/>только на компьютере</p>
-    <p class="mobile-sub">Но твои приложения доступны с телефона:</p>
-    <div class="mobile-apps">
-      <a class="mobile-app-link" id="mobileDoubleDo" href="https://doubledo.vercel.app">
-        <div class="mobile-app-icon">
-          <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
-            <circle cx="7" cy="10" r="5" stroke="#FF4D1C" stroke-width="1.5"/>
-            <circle cx="13" cy="10" r="5" stroke="#FF4D1C" stroke-width="1.5"/>
-          </svg>
-        </div>
-        <div class="mobile-app-info">
-          <div class="mobile-app-name">DoubleDo</div>
-          <div class="mobile-app-desc">соревнование · привычки</div>
-        </div>
-        <span class="mobile-app-arrow">→</span>
-      </a>
-      <div class="mobile-app-locked">
-        <div class="mobile-app-info">
-          <div class="mobile-app-name">Aurora</div>
-          <div class="mobile-app-desc">сон · скоро</div>
-        </div>
-        <span class="badge-soon">soon</span>
+
+    <!-- Не авторизован -->
+    <div class="mobile-auth" id="mobileAuth">
+      <p class="mobile-title">Войди, чтобы<br/>открыть приложения</p>
+
+      <div class="mobile-auth-step" id="mobileStep1">
+        <input type="email" id="mobileEmail" class="login-input" placeholder="Email" autocomplete="email" inputmode="email" />
+        <button class="login-btn" id="mobileSendBtn">Получить код</button>
       </div>
-      <div class="mobile-app-locked">
-        <div class="mobile-app-info">
-          <div class="mobile-app-name">Focus</div>
-          <div class="mobile-app-desc">концентрация · скоро</div>
-        </div>
-        <span class="badge-soon">soon</span>
+
+      <div class="mobile-auth-step" id="mobileStep2" style="display:none">
+        <p class="login-hint" id="mobileHint"></p>
+        <input type="text" id="mobileOtp" class="login-input login-input--otp" placeholder="123456" maxlength="6" inputmode="numeric" autocomplete="one-time-code" />
+        <button class="login-btn" id="mobileVerifyBtn">Войти</button>
+        <button class="login-back" id="mobileBackBtn">← другой email</button>
       </div>
-      <div class="mobile-app-locked">
-        <div class="mobile-app-info">
-          <div class="mobile-app-name">Agenda</div>
-          <div class="mobile-app-desc">планер · скоро</div>
-        </div>
-        <span class="badge-soon">soon</span>
+
+      <div class="login-error" id="mobileError"></div>
+      <p class="mobile-pc-note">Дашборд доступен только на компьютере</p>
+    </div>
+
+    <!-- Авторизован -->
+    <div class="mobile-logged" id="mobileLogged" style="display:none">
+      <div class="mobile-user-row">
+        <span class="mobile-username" id="mobileUsername"></span>
+        <button class="mobile-logout" id="mobileLogout">выйти</button>
       </div>
-      <div class="mobile-app-locked">
-        <div class="mobile-app-info">
-          <div class="mobile-app-name">Note</div>
-          <div class="mobile-app-desc">журнал · скоро</div>
+      <p class="mobile-sub">Твои приложения:</p>
+      <div class="mobile-apps">
+        <a class="mobile-app-link" id="mobileDoubleDo" href="https://doubledo.vercel.app">
+          <div class="mobile-app-icon">
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+              <circle cx="7" cy="10" r="5" stroke="#FF4D1C" stroke-width="1.5"/>
+              <circle cx="13" cy="10" r="5" stroke="#FF4D1C" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="mobile-app-info">
+            <div class="mobile-app-name">DoubleDo</div>
+            <div class="mobile-app-desc">соревнование · привычки</div>
+          </div>
+          <span class="mobile-app-arrow">→</span>
+        </a>
+        <div class="mobile-app-locked">
+          <div class="mobile-app-info">
+            <div class="mobile-app-name">Aurora</div>
+            <div class="mobile-app-desc">сон · скоро</div>
+          </div>
+          <span class="badge-soon">soon</span>
         </div>
-        <span class="badge-soon">soon</span>
+        <div class="mobile-app-locked">
+          <div class="mobile-app-info">
+            <div class="mobile-app-name">Focus</div>
+            <div class="mobile-app-desc">концентрация · скоро</div>
+          </div>
+          <span class="badge-soon">soon</span>
+        </div>
+        <div class="mobile-app-locked">
+          <div class="mobile-app-info">
+            <div class="mobile-app-name">Agenda</div>
+            <div class="mobile-app-desc">планер · скоро</div>
+          </div>
+          <span class="badge-soon">soon</span>
+        </div>
+        <div class="mobile-app-locked">
+          <div class="mobile-app-info">
+            <div class="mobile-app-name">Note</div>
+            <div class="mobile-app-desc">журнал · скоро</div>
+          </div>
+          <span class="badge-soon">soon</span>
+        </div>
       </div>
     </div>
   </div>

@@ -54,7 +54,9 @@ async function init() {
     runSplash(),
   ])
 
-  if (session) {
+  if (isMobile()) {
+    await initMobile(session?.user ?? null)
+  } else if (session) {
     await loadDashboard(session.user)
   } else {
     showLogin()
@@ -146,19 +148,93 @@ document.getElementById('navDoubleDo').addEventListener('click', e => {
   openApp(APPS.doubledo)
 })
 
-const mobileDD = document.getElementById('mobileDoubleDo')
-if (mobileDD) {
-  mobileDD.addEventListener('click', async e => {
-    e.preventDefault()
-    const { data: { session } } = await sb.auth.getSession()
-    if (session) {
-      const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
-      window.location.href = `${APPS.doubledo}#${hash}`
-    } else {
-      window.location.href = APPS.doubledo
-    }
-  })
+/* === MOBILE AUTH === */
+function isMobile() {
+  return window.innerWidth <= 768
 }
+
+async function initMobile(user) {
+  if (user) {
+    showMobileLogged(user)
+  } else {
+    document.getElementById('mobileAuth').style.display = 'flex'
+    document.getElementById('mobileLogged').style.display = 'none'
+  }
+}
+
+async function showMobileLogged(user) {
+  const { data: profile } = await sb.from('users').select('username').eq('id', user.id).single()
+  document.getElementById('mobileAuth').style.display = 'none'
+  document.getElementById('mobileLogged').style.display = 'flex'
+  document.getElementById('mobileUsername').textContent = profile?.username ?? user.email
+}
+
+let mobileOtpEmail = ''
+
+document.getElementById('mobileSendBtn')?.addEventListener('click', async () => {
+  const email = document.getElementById('mobileEmail').value.trim()
+  const errorEl = document.getElementById('mobileError')
+  const btn = document.getElementById('mobileSendBtn')
+  if (!email) { errorEl.textContent = 'Введи email'; return }
+
+  btn.textContent = 'Отправка…'; btn.disabled = true; errorEl.textContent = ''
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } })
+  if (error) {
+    errorEl.textContent = 'Не удалось отправить код'
+    btn.textContent = 'Получить код'; btn.disabled = false; return
+  }
+  mobileOtpEmail = email
+  document.getElementById('mobileStep1').style.display = 'none'
+  document.getElementById('mobileStep2').style.display = 'flex'
+  document.getElementById('mobileHint').textContent = `Код отправлен на ${email}`
+  document.getElementById('mobileOtp').focus()
+})
+
+document.getElementById('mobileVerifyBtn')?.addEventListener('click', async () => {
+  const token = document.getElementById('mobileOtp').value.trim()
+  const errorEl = document.getElementById('mobileError')
+  const btn = document.getElementById('mobileVerifyBtn')
+  if (!token || token.length < 6) { errorEl.textContent = 'Введи 6-значный код'; return }
+
+  btn.textContent = 'Проверка…'; btn.disabled = true; errorEl.textContent = ''
+  const { error } = await sb.auth.verifyOtp({ email: mobileOtpEmail, token, type: 'email' })
+  if (error) {
+    errorEl.textContent = 'Неверный или истёкший код'
+    btn.textContent = 'Войти'; btn.disabled = false; return
+  }
+  const { data: { user } } = await sb.auth.getUser()
+  showMobileLogged(user)
+})
+
+document.getElementById('mobileBackBtn')?.addEventListener('click', () => {
+  document.getElementById('mobileStep1').style.display = 'flex'
+  document.getElementById('mobileStep2').style.display = 'none'
+  document.getElementById('mobileError').textContent = ''
+  document.getElementById('mobileOtp').value = ''
+  const btn = document.getElementById('mobileSendBtn')
+  btn.textContent = 'Получить код'; btn.disabled = false
+})
+
+document.getElementById('mobileLogout')?.addEventListener('click', async () => {
+  await sb.auth.signOut()
+  document.getElementById('mobileLogged').style.display = 'none'
+  document.getElementById('mobileAuth').style.display = 'flex'
+  document.getElementById('mobileStep1').style.display = 'flex'
+  document.getElementById('mobileStep2').style.display = 'none'
+  document.getElementById('mobileEmail').value = ''
+  document.getElementById('mobileOtp').value = ''
+})
+
+document.getElementById('mobileDoubleDo')?.addEventListener('click', async e => {
+  e.preventDefault()
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) {
+    const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
+    window.location.href = `${APPS.doubledo}#${hash}`
+  } else {
+    window.location.href = APPS.doubledo
+  }
+})
 
 document.querySelector('.btn-open').addEventListener('click', () => openApp(APPS.doubledo))
 
