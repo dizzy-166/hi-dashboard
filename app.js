@@ -174,14 +174,22 @@ document.getElementById('loginBackBtn').addEventListener('click', () => {
   document.getElementById('loginOtp').value = ''
 })
 
-document.getElementById('navDoubleDo').addEventListener('click', e => {
+document.getElementById('navDoubleDo').addEventListener('click', async e => {
   e.preventDefault()
-  openApp(APPS.doubledo)
+  const { data: { session } } = await sb.auth.getSession()
+  const hash = session
+    ? `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
+    : null
+  window.location.href = hash ? `${APPS.doubledo}#${hash}` : APPS.doubledo
 })
 
-document.getElementById('navRead').addEventListener('click', e => {
+document.getElementById('navRead').addEventListener('click', async e => {
   e.preventDefault()
-  openApp(APPS.read)
+  const { data: { session } } = await sb.auth.getSession()
+  const hash = session
+    ? `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
+    : null
+  window.location.href = hash ? `${APPS.read}#${hash}` : APPS.read
 })
 
 /* === REGISTRATION HELPERS === */
@@ -320,7 +328,13 @@ document.getElementById('mobileRead')?.addEventListener('click', async e => {
   }
 })
 
-document.querySelector('.btn-open').addEventListener('click', () => openApp(APPS.doubledo))
+document.querySelector('.btn-open').addEventListener('click', async () => {
+  const { data: { session } } = await sb.auth.getSession()
+  const hash = session
+    ? `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
+    : null
+  window.location.href = hash ? `${APPS.doubledo}#${hash}` : APPS.doubledo
+})
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   await sb.auth.signOut()
