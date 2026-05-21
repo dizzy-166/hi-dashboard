@@ -7,6 +7,17 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let currentUser = null
 let currentCompetition = null
 
+const APPS = {
+  doubledo: 'https://doubledo.vercel.app',
+}
+
+async function openApp(baseUrl) {
+  const { data: { session } } = await sb.auth.getSession()
+  if (!session) { window.open(baseUrl, '_blank'); return }
+  const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
+  window.open(`${baseUrl}#${hash}`, '_blank')
+}
+
 /* === INIT === */
 async function init() {
   drawSparkline()
@@ -99,6 +110,13 @@ document.getElementById('loginBackBtn').addEventListener('click', () => {
   document.getElementById('loginSendBtn').disabled = false
   document.getElementById('loginOtp').value = ''
 })
+
+document.getElementById('navDoubleDo').addEventListener('click', e => {
+  e.preventDefault()
+  openApp(APPS.doubledo)
+})
+
+document.querySelector('.btn-open').addEventListener('click', () => openApp(APPS.doubledo))
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   await sb.auth.signOut()
