@@ -6,17 +6,28 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 let currentUser = null
 let currentCompetition = null
+let currentSession = null
 
 const APPS = {
   doubledo: 'https://doubledo.vercel.app',
   read: 'https://read-hi.vercel.app',
 }
 
-async function openApp(baseUrl) {
-  const { data: { session } } = await sb.auth.getSession()
-  if (!session) { window.open(baseUrl, '_blank'); return }
+/** Pre-set nav link hrefs so clicks are instant — no async needed */
+function updateNavLinks(session) {
+  currentSession = session
+  if (!session) return
   const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
-  window.open(`${baseUrl}#${hash}`, '_blank')
+  document.getElementById('navDoubleDo').href = `${APPS.doubledo}#${hash}`
+  document.getElementById('navRead').href      = `${APPS.read}#${hash}`
+  // mobile
+  const mDD  = document.getElementById('mobileDoubleDo')
+  const mRd  = document.getElementById('mobileRead')
+  if (mDD) mDD.href = `${APPS.doubledo}#${hash}`
+  if (mRd) mRd.href = `${APPS.read}#${hash}`
+  // btn-open widget
+  const btnOpen = document.querySelector('.btn-open')
+  if (btnOpen) btnOpen.dataset.url = `${APPS.doubledo}#${hash}`
 }
 
 /* === SPLASH === */
@@ -54,6 +65,8 @@ async function init() {
     sb.auth.getSession(),
     runSplash(),
   ])
+
+  updateNavLinks(session)
 
   if (isMobile()) {
     await initMobile(session?.user ?? null)
@@ -127,6 +140,8 @@ document.getElementById('loginVerifyBtn').addEventListener('click', async () => 
   }
 
   const { data: { user } } = await sb.auth.getUser()
+  const { data: { session: newSession } } = await sb.auth.getSession()
+  updateNavLinks(newSession)
   await handlePostAuth(user, {
     onExisting: async () => { hideLogin(); await loadDashboard(user) },
     onNew: () => {
@@ -174,23 +189,8 @@ document.getElementById('loginBackBtn').addEventListener('click', () => {
   document.getElementById('loginOtp').value = ''
 })
 
-document.getElementById('navDoubleDo').addEventListener('click', async e => {
-  e.preventDefault()
-  const { data: { session } } = await sb.auth.getSession()
-  const hash = session
-    ? `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
-    : null
-  window.location.href = hash ? `${APPS.doubledo}#${hash}` : APPS.doubledo
-})
-
-document.getElementById('navRead').addEventListener('click', async e => {
-  e.preventDefault()
-  const { data: { session } } = await sb.auth.getSession()
-  const hash = session
-    ? `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
-    : null
-  window.location.href = hash ? `${APPS.read}#${hash}` : APPS.read
-})
+// navDoubleDo and navRead hrefs are set by updateNavLinks() after session loads
+// — plain anchor clicks, no JS handler needed
 
 /* === REGISTRATION HELPERS === */
 async function handlePostAuth(user, { onExisting, onNew }) {
@@ -306,34 +306,11 @@ document.getElementById('mobileLogout')?.addEventListener('click', async () => {
   document.getElementById('mobileOtp').value = ''
 })
 
-document.getElementById('mobileDoubleDo')?.addEventListener('click', async e => {
-  e.preventDefault()
-  const { data: { session } } = await sb.auth.getSession()
-  if (session) {
-    const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
-    window.location.href = `${APPS.doubledo}#${hash}`
-  } else {
-    window.location.href = APPS.doubledo
-  }
-})
+// mobileDoubleDo and mobileRead hrefs are set by updateNavLinks() — plain anchor clicks
 
-document.getElementById('mobileRead')?.addEventListener('click', async e => {
-  e.preventDefault()
-  const { data: { session } } = await sb.auth.getSession()
-  if (session) {
-    const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
-    window.location.href = `${APPS.read}#${hash}`
-  } else {
-    window.location.href = APPS.read
-  }
-})
-
-document.querySelector('.btn-open').addEventListener('click', async () => {
-  const { data: { session } } = await sb.auth.getSession()
-  const hash = session
-    ? `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
-    : null
-  window.location.href = hash ? `${APPS.doubledo}#${hash}` : APPS.doubledo
+document.querySelector('.btn-open').addEventListener('click', () => {
+  const url = document.querySelector('.btn-open').dataset.url || APPS.doubledo
+  window.location.href = url
 })
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
