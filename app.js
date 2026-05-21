@@ -9,6 +9,7 @@ let currentCompetition = null
 
 const APPS = {
   doubledo: 'https://doubledo.vercel.app',
+  read: 'https://read-hi.vercel.app',
 }
 
 async function openApp(baseUrl) {
@@ -178,6 +179,11 @@ document.getElementById('navDoubleDo').addEventListener('click', e => {
   openApp(APPS.doubledo)
 })
 
+document.getElementById('navRead').addEventListener('click', e => {
+  e.preventDefault()
+  openApp(APPS.read)
+})
+
 /* === REGISTRATION HELPERS === */
 async function handlePostAuth(user, { onExisting, onNew }) {
   const { data: profile } = await sb.from('users').select('id').eq('id', user.id).maybeSingle()
@@ -300,6 +306,17 @@ document.getElementById('mobileDoubleDo')?.addEventListener('click', async e => 
     window.location.href = `${APPS.doubledo}#${hash}`
   } else {
     window.location.href = APPS.doubledo
+  }
+})
+
+document.getElementById('mobileRead')?.addEventListener('click', async e => {
+  e.preventDefault()
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) {
+    const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
+    window.location.href = `${APPS.read}#${hash}`
+  } else {
+    window.location.href = APPS.read
   }
 })
 
