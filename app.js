@@ -146,6 +146,20 @@ document.getElementById('navDoubleDo').addEventListener('click', e => {
   openApp(APPS.doubledo)
 })
 
+const mobileDD = document.getElementById('mobileDoubleDo')
+if (mobileDD) {
+  mobileDD.addEventListener('click', async e => {
+    e.preventDefault()
+    const { data: { session } } = await sb.auth.getSession()
+    if (session) {
+      const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
+      window.location.href = `${APPS.doubledo}#${hash}`
+    } else {
+      window.location.href = APPS.doubledo
+    }
+  })
+}
+
 document.querySelector('.btn-open').addEventListener('click', () => openApp(APPS.doubledo))
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
