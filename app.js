@@ -16,11 +16,13 @@ const APPS = {
   read: 'https://read-hi.vercel.app',
 }
 
-/** Pre-set nav link hrefs so clicks are instant — no async needed */
+/** Pre-set nav link hrefs so clicks are instant — no async needed.
+ *  Lang is appended to the hash so sub-apps (different origins) can read it. */
 function updateNavLinks(session) {
   currentSession = session
   if (!session) return
-  const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink`
+  const lang = HiLang.getLang()
+  const hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&token_type=bearer&type=magiclink&lang=${lang}`
   document.getElementById('navDoubleDo').href = `${APPS.doubledo}#${hash}`
   document.getElementById('navRead').href      = `${APPS.read}#${hash}`
   // mobile
@@ -327,14 +329,11 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 document.getElementById('langToggle').addEventListener('click', () => {
   const next = HiLang.getLang() === 'ru' ? 'en' : 'ru'
   HiLang.setLang(next)
+  // Rebuild nav links so sub-apps get the new lang on next click
+  if (currentSession) updateNavLinks(currentSession)
   // Re-render the dashboard with new language if loaded
   if (currentUser && currentCompetition) {
     loadDashboard(currentUser)
-  }
-  // Re-apply initial states if not yet loaded
-  const insightEl = document.getElementById('insightText')
-  if (insightEl && insightEl.textContent === HiLang.t('insightLoading')) {
-    // still loading — nothing extra needed
   }
 })
 
