@@ -257,6 +257,8 @@ document.getElementById('mobileVerifyBtn')?.addEventListener('click', async () =
     errorEl.textContent = 'Неверный или истёкший код'
     btn.textContent = 'Войти'; btn.disabled = false; return
   }
+  const { data: { session: mobSession } } = await sb.auth.getSession()
+  if (mobSession) updateNavLinks(mobSession)
   const { data: { user } } = await sb.auth.getUser()
   await handlePostAuth(user, {
     onExisting: async () => showMobileLogged(user),
@@ -348,6 +350,10 @@ async function loadDashboard(user) {
     const competition = competitions[0]
     currentCompetition = competition
 
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayStr = today.toISOString().slice(0, 10)
+
     const [{ data: habit }, { data: users }, { data: progress }] = await Promise.all([
       sb.from('habits').select('title').eq('id', competition.habit_id).single(),
       sb.from('users').select('id, username').in('id', [competition.user1_id, competition.user2_id]),
@@ -356,9 +362,11 @@ async function loadDashboard(user) {
         .eq('habit_id', competition.habit_id)
         .in('user_id', [competition.user1_id, competition.user2_id])
         .gte('completed_date', competition.start_date)
+        .lte('completed_date', todayStr)
         .order('completed_date'),
     ])
 
+    if (!habit) throw new Error('Habit not found for competition ' + competition.id)
     competition.habit = habit
     competition.user1 = users?.find(u => u.id === competition.user1_id)
     competition.user2 = users?.find(u => u.id === competition.user2_id)
@@ -366,16 +374,14 @@ async function loadDashboard(user) {
     const isUser1 = user.id === competition.user1_id
     const me = isUser1 ? competition.user1 : competition.user2
     const rival = isUser1 ? competition.user2 : competition.user1
-    const myStreak = isUser1 ? competition.user1_streak : competition.user2_streak
-    const rivalStreak = isUser1 ? competition.user2_streak : competition.user1_streak
-    const myScore = isUser1 ? competition.user1_score : competition.user2_score
+    if (!me || !rival) throw new Error('Participant data missing for competition ' + competition.id)
+    const myStreak = (isUser1 ? competition.user1_streak : competition.user2_streak) ?? 0
+    const rivalStreak = (isUser1 ? competition.user2_streak : competition.user1_streak) ?? 0
+    const myScore = (isUser1 ? competition.user1_score : competition.user2_score) ?? 0
     const rivalId = isUser1 ? competition.user2_id : competition.user1_id
 
     const startDate = new Date(competition.start_date)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
     const dayNumber = Math.floor((today - startDate) / 86400000) + 1
-    const todayStr = today.toISOString().slice(0, 10)
 
     const myDoneToday = progress?.some(p => p.user_id === user.id && p.completed_date === todayStr && p.is_completed) ?? false
     const rivalDoneToday = progress?.some(p => p.user_id === rivalId && p.completed_date === todayStr && p.is_completed) ?? false
