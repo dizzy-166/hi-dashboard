@@ -8,6 +8,9 @@ let currentUser = null
 let currentCompetition = null
 let currentSession = null
 
+// Shorthand for current-language translate
+const t = (key, ...args) => HiLang.t(key, ...args)
+
 const APPS = {
   doubledo: 'https://doubledo.vercel.app',
   read: 'https://read-hi.vercel.app',
@@ -61,6 +64,9 @@ async function init() {
   drawSparkline()
   drawArcs(0)
 
+  // Apply language to all static elements
+  HiLang.apply()
+
   const [{ data: { session } }] = await Promise.all([
     sb.auth.getSession(),
     runSplash(),
@@ -93,17 +99,17 @@ document.getElementById('loginSendBtn').addEventListener('click', async () => {
   const errorEl = document.getElementById('loginError')
   const btn = document.getElementById('loginSendBtn')
 
-  if (!email) { errorEl.textContent = 'Введи email'; return }
+  if (!email) { errorEl.textContent = t('loginErrEmail'); return }
 
-  btn.textContent = 'Отправка…'
+  btn.textContent = t('loginSending')
   btn.disabled = true
   errorEl.textContent = ''
 
   const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } })
 
   if (error) {
-    errorEl.textContent = error.message || 'Не удалось отправить код'
-    btn.textContent = 'Получить код'
+    errorEl.textContent = error.message || t('loginErrSend')
+    btn.textContent = t('loginSendBtn')
     btn.disabled = false
     return
   }
@@ -111,7 +117,7 @@ document.getElementById('loginSendBtn').addEventListener('click', async () => {
   otpEmail = email
   document.getElementById('loginStep1').style.display = 'none'
   document.getElementById('loginStep2').style.display = 'block'
-  document.getElementById('loginHint').textContent = `Код отправлен на ${email}`
+  document.getElementById('loginHint').textContent = t('loginHint', email)
   document.getElementById('loginOtp').focus()
 })
 
@@ -124,17 +130,17 @@ document.getElementById('loginVerifyBtn').addEventListener('click', async () => 
   const errorEl = document.getElementById('loginError')
   const btn = document.getElementById('loginVerifyBtn')
 
-  if (!token || token.length < 6) { errorEl.textContent = 'Введи 6-значный код'; return }
+  if (!token || token.length < 6) { errorEl.textContent = t('loginErrCode'); return }
 
-  btn.textContent = 'Проверка…'
+  btn.textContent = t('loginVerifying')
   btn.disabled = true
   errorEl.textContent = ''
 
   const { error } = await sb.auth.verifyOtp({ email: otpEmail, token, type: 'email' })
 
   if (error) {
-    errorEl.textContent = 'Неверный или истёкший код'
-    btn.textContent = 'Войти'
+    errorEl.textContent = t('loginErrOtp')
+    btn.textContent = t('loginVerifyBtn')
     btn.disabled = false
     return
   }
@@ -161,16 +167,16 @@ document.getElementById('loginCreateBtn').addEventListener('click', async () => 
   const errorEl = document.getElementById('loginError')
   const btn = document.getElementById('loginCreateBtn')
 
-  if (!username || username.length < 3) { errorEl.textContent = 'Минимум 3 символа'; return }
-  if (!/^[a-z0-9_]+$/.test(username)) { errorEl.textContent = 'Только латиница, цифры и _'; return }
+  if (!username || username.length < 3) { errorEl.textContent = t('loginErrMin3'); return }
+  if (!/^[a-z0-9_]+$/.test(username)) { errorEl.textContent = t('loginErrLatin'); return }
 
-  btn.textContent = 'Создание…'; btn.disabled = true; errorEl.textContent = ''
+  btn.textContent = t('loginCreating'); btn.disabled = true; errorEl.textContent = ''
 
   const { data: { user } } = await sb.auth.getUser()
   const { error } = await createProfile(user, username)
   if (error) {
-    errorEl.textContent = error.code === '23505' ? 'Имя занято, выбери другое' : 'Ошибка, попробуй снова'
-    btn.textContent = 'Создать аккаунт'; btn.disabled = false; return
+    errorEl.textContent = error.code === '23505' ? t('loginErrTaken') : t('loginErrGeneric')
+    btn.textContent = t('loginCreateBtn'); btn.disabled = false; return
   }
   hideLogin()
   await loadDashboard(user)
@@ -184,13 +190,10 @@ document.getElementById('loginBackBtn').addEventListener('click', () => {
   document.getElementById('loginStep1').style.display = 'block'
   document.getElementById('loginStep2').style.display = 'none'
   document.getElementById('loginError').textContent = ''
-  document.getElementById('loginSendBtn').textContent = 'Получить код'
+  document.getElementById('loginSendBtn').textContent = t('loginSendBtn')
   document.getElementById('loginSendBtn').disabled = false
   document.getElementById('loginOtp').value = ''
 })
-
-// navDoubleDo and navRead hrefs are set by updateNavLinks() after session loads
-// — plain anchor clicks, no JS handler needed
 
 /* === REGISTRATION HELPERS === */
 async function handlePostAuth(user, { onExisting, onNew }) {
@@ -230,18 +233,18 @@ document.getElementById('mobileSendBtn')?.addEventListener('click', async () => 
   const email = document.getElementById('mobileEmail').value.trim()
   const errorEl = document.getElementById('mobileError')
   const btn = document.getElementById('mobileSendBtn')
-  if (!email) { errorEl.textContent = 'Введи email'; return }
+  if (!email) { errorEl.textContent = t('loginErrEmail'); return }
 
-  btn.textContent = 'Отправка…'; btn.disabled = true; errorEl.textContent = ''
+  btn.textContent = t('loginSending'); btn.disabled = true; errorEl.textContent = ''
   const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } })
   if (error) {
-    errorEl.textContent = error.message || 'Не удалось отправить код'
-    btn.textContent = 'Получить код'; btn.disabled = false; return
+    errorEl.textContent = error.message || t('loginErrSend')
+    btn.textContent = t('loginSendBtn'); btn.disabled = false; return
   }
   mobileOtpEmail = email
   document.getElementById('mobileStep1').style.display = 'none'
   document.getElementById('mobileStep2').style.display = 'flex'
-  document.getElementById('mobileHint').textContent = `Код отправлен на ${email}`
+  document.getElementById('mobileHint').textContent = t('mobileHint', email)
   document.getElementById('mobileOtp').focus()
 })
 
@@ -249,13 +252,13 @@ document.getElementById('mobileVerifyBtn')?.addEventListener('click', async () =
   const token = document.getElementById('mobileOtp').value.trim()
   const errorEl = document.getElementById('mobileError')
   const btn = document.getElementById('mobileVerifyBtn')
-  if (!token || token.length < 6) { errorEl.textContent = 'Введи 6-значный код'; return }
+  if (!token || token.length < 6) { errorEl.textContent = t('loginErrCode'); return }
 
-  btn.textContent = 'Проверка…'; btn.disabled = true; errorEl.textContent = ''
+  btn.textContent = t('loginVerifying'); btn.disabled = true; errorEl.textContent = ''
   const { error } = await sb.auth.verifyOtp({ email: mobileOtpEmail, token, type: 'email' })
   if (error) {
-    errorEl.textContent = 'Неверный или истёкший код'
-    btn.textContent = 'Войти'; btn.disabled = false; return
+    errorEl.textContent = t('loginErrOtp')
+    btn.textContent = t('loginVerifyBtn'); btn.disabled = false; return
   }
   const { data: { session: mobSession } } = await sb.auth.getSession()
   if (mobSession) updateNavLinks(mobSession)
@@ -275,16 +278,16 @@ document.getElementById('mobileCreateBtn')?.addEventListener('click', async () =
   const errorEl = document.getElementById('mobileError')
   const btn = document.getElementById('mobileCreateBtn')
 
-  if (!username || username.length < 3) { errorEl.textContent = 'Минимум 3 символа'; return }
-  if (!/^[a-z0-9_]+$/.test(username)) { errorEl.textContent = 'Только латиница, цифры и _'; return }
+  if (!username || username.length < 3) { errorEl.textContent = t('loginErrMin3'); return }
+  if (!/^[a-z0-9_]+$/.test(username)) { errorEl.textContent = t('loginErrLatin'); return }
 
-  btn.textContent = 'Создание…'; btn.disabled = true; errorEl.textContent = ''
+  btn.textContent = t('loginCreating'); btn.disabled = true; errorEl.textContent = ''
 
   const { data: { user } } = await sb.auth.getUser()
   const { error } = await createProfile(user, username)
   if (error) {
-    errorEl.textContent = error.code === '23505' ? 'Имя занято, выбери другое' : 'Ошибка'
-    btn.textContent = 'Создать аккаунт'; btn.disabled = false; return
+    errorEl.textContent = error.code === '23505' ? t('loginErrTaken') : t('loginErrGeneric')
+    btn.textContent = t('loginCreateBtn'); btn.disabled = false; return
   }
   showMobileLogged(user)
 })
@@ -295,7 +298,7 @@ document.getElementById('mobileBackBtn')?.addEventListener('click', () => {
   document.getElementById('mobileError').textContent = ''
   document.getElementById('mobileOtp').value = ''
   const btn = document.getElementById('mobileSendBtn')
-  btn.textContent = 'Получить код'; btn.disabled = false
+  btn.textContent = t('loginSendBtn'); btn.disabled = false
 })
 
 document.getElementById('mobileLogout')?.addEventListener('click', async () => {
@@ -308,8 +311,6 @@ document.getElementById('mobileLogout')?.addEventListener('click', async () => {
   document.getElementById('mobileOtp').value = ''
 })
 
-// mobileDoubleDo and mobileRead hrefs are set by updateNavLinks() — plain anchor clicks
-
 document.querySelector('.btn-open').addEventListener('click', () => {
   const url = document.querySelector('.btn-open').dataset.url || APPS.doubledo
   window.location.href = url
@@ -320,6 +321,21 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   currentUser = null
   currentCompetition = null
   showLogin()
+})
+
+/* === LANG TOGGLE === */
+document.getElementById('langToggle').addEventListener('click', () => {
+  const next = HiLang.getLang() === 'ru' ? 'en' : 'ru'
+  HiLang.setLang(next)
+  // Re-render the dashboard with new language if loaded
+  if (currentUser && currentCompetition) {
+    loadDashboard(currentUser)
+  }
+  // Re-apply initial states if not yet loaded
+  const insightEl = document.getElementById('insightText')
+  if (insightEl && insightEl.textContent === HiLang.t('insightLoading')) {
+    // still loading — nothing extra needed
+  }
 })
 
 /* === DASHBOARD === */
@@ -343,7 +359,7 @@ async function loadDashboard(user) {
     if (compError) throw compError
 
     if (!competitions || competitions.length === 0) {
-      document.getElementById('insightText').textContent = 'Активных соревнований нет.'
+      document.getElementById('insightText').textContent = t('insightNoComp')
       return
     }
 
@@ -393,7 +409,7 @@ async function loadDashboard(user) {
     })
   } catch (err) {
     console.error('loadDashboard:', err)
-    document.getElementById('insightText').textContent = 'Ошибка загрузки данных. Проверь консоль.'
+    document.getElementById('insightText').textContent = t('insightError')
   }
 }
 
@@ -403,8 +419,8 @@ function render({ me, rival, myStreak, rivalStreak, myScore, competition, dayNum
   // DoubleDo header
   document.getElementById('ddDay').textContent = dayNumber
   document.getElementById('ddHabitName').textContent = competition.habit.title
-  document.getElementById('seriesLabel').textContent = `серия ${dayNumber}`
-  document.getElementById('heatmapDaysLabel').textContent = `${dayNumber} ДНЕЙ`
+  document.getElementById('seriesLabel').textContent = t('series', dayNumber)
+  document.getElementById('heatmapDaysLabel').textContent = t('daysLabel', dayNumber)
 
   // Avatars & labels
   const myInitials = me.username.slice(0, 2).toUpperCase()
@@ -412,7 +428,7 @@ function render({ me, rival, myStreak, rivalStreak, myScore, competition, dayNum
   document.getElementById('myAvatar').textContent = myInitials
   document.getElementById('rivalAvatar').textContent = rivalInitials
   document.getElementById('navAvatar').textContent = myInitials
-  document.getElementById('myLabel').textContent = 'ты'
+  document.getElementById('myLabel').textContent = t('youLabel')
   document.getElementById('rivalLabel').textContent = rival.username
   document.getElementById('rivalHeatmapLabel').textContent = rival.username
 
@@ -423,20 +439,20 @@ function render({ me, rival, myStreak, rivalStreak, myScore, competition, dayNum
   // Today status
   const myStatusEl = document.getElementById('myStatus')
   myStatusEl.className = 'dd-status ' + (myDoneToday ? 'done' : 'none')
-  myStatusEl.textContent = myDoneToday ? '● сегодня сделано' : '○ сегодня — нет'
+  myStatusEl.textContent = myDoneToday ? t('statusDone') : t('statusNone')
 
   const rivalStatusEl = document.getElementById('rivalStatus')
   rivalStatusEl.className = 'dd-status ' + (rivalDoneToday ? 'done' : 'none')
-  rivalStatusEl.textContent = rivalDoneToday ? '● сегодня сделано' : '○ сегодня — нет'
+  rivalStatusEl.textContent = rivalDoneToday ? t('statusDone') : t('statusNone')
 
   // Mark button state
   const btnMark = document.getElementById('btnMark')
   btnMark.disabled = myDoneToday
-  btnMark.textContent = myDoneToday ? '✓ Сегодня отмечено' : '✓ Отметить сегодня'
+  btnMark.textContent = myDoneToday ? t('btnMarkDone') : t('btnMark')
   btnMark.style.opacity = myDoneToday ? '0.5' : '1'
 
   // Cheer button
-  document.getElementById('btnCheer').textContent = `→ Подбодрить ${rival.username}`
+  document.getElementById('btnCheer').textContent = t('btnCheer', rival.username)
 
   // HI score
   document.getElementById('scoreNumber').textContent = myScore
@@ -446,26 +462,30 @@ function render({ me, rival, myStreak, rivalStreak, myScore, competition, dayNum
   // Bottom card
   document.getElementById('bcSub').textContent = `${competition.habit.title} · vs · ${rival.username} · ${myStreak}–${rivalStreak}`
 
+  // Heatmap labels
+  document.getElementById('heatmapYouLabel').textContent = t('heatmapYou')
+
   // Insight
   const diff = rivalStreak - myStreak
+  const dw = t('dayWord', Math.abs(diff))
   let insight
   if (myDoneToday && !rivalDoneToday) {
-    insight = `Ты уже отметил(а) сегодня, а ${rival.username} — ещё нет. Хорошее начало дня ${dayNumber}!`
+    insight = t('insightMeDone', rival.username, dayNumber)
   } else if (!myDoneToday && rivalDoneToday) {
-    insight = `${rival.username} уже отметил(а) сегодня. Не отставай — серия ${dayNumber} дней ждёт!`
+    insight = t('insightRivalDone', rival.username, dayNumber)
   } else if (diff > 0) {
-    insight = `Стрик ${rival.username} на ${diff} ${dayWord(diff)} больше. До его лучшего ещё есть пространство — не сбавляй темп.`
+    insight = t('insightRivalAhead', rival.username, Math.abs(diff), dw)
   } else if (diff < 0) {
-    insight = `Твой стрик на ${Math.abs(diff)} ${dayWord(Math.abs(diff))} впереди ${rival.username}. Держи преимущество!`
+    insight = t('insightMeAhead', rival.username, Math.abs(diff), t('dayWord', Math.abs(diff)))
   } else {
-    insight = `Стрики равны — ${myStreak} ${dayWord(myStreak)} подряд у обоих. День ${dayNumber} решит многое.`
+    insight = t('insightTied', myStreak, t('dayWord', myStreak))
   }
   document.getElementById('insightText').textContent = insight
 
   // Footer
   const now = new Date()
   document.getElementById('footerSync').textContent = `SYNC · ${now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} · OK`
-  document.getElementById('footerUser').textContent = `+ habits · ${me.username}`
+  document.getElementById('footerUser').textContent = t('footerUser', me.username)
 
   // Heatmap
   buildHeatmaps(competition, progress, userId, rivalId, dayNumber, todayStr)
@@ -473,27 +493,18 @@ function render({ me, rival, myStreak, rivalStreak, myScore, competition, dayNum
 
 function updateDateTime(username) {
   const now = new Date()
-  const days = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ']
-  const months = ['ЯНВ', 'ФЕВ', 'МАР', 'АПР', 'МАЯ', 'ИЮН', 'ИЮЛ', 'АВГ', 'СЕН', 'ОКТ', 'НОЯ', 'ДЕК']
+  const days   = t('days')
+  const months = t('months')
   const d = `${days[now.getDay()]} · ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} · ${now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`
   document.getElementById('dateLabel').textContent = d
   if (username) document.getElementById('greetingName').textContent = username
 
   const h = now.getHours()
-  let greeting = 'Доброе утро'
-  if (h >= 12 && h < 17) greeting = 'Добрый день'
-  else if (h >= 17 && h < 22) greeting = 'Добрый вечер'
-  else if (h >= 22 || h < 5) greeting = 'Доброй ночи'
+  let greeting = t('goodMorning')
+  if (h >= 12 && h < 17) greeting = t('goodDay')
+  else if (h >= 17 && h < 22) greeting = t('goodEvening')
+  else if (h >= 22 || h < 5) greeting = t('goodNight')
   document.querySelector('.greeting').childNodes[0].textContent = `${greeting}, `
-}
-
-function dayWord(n) {
-  const abs = Math.abs(n) % 100
-  if (abs >= 11 && abs <= 19) return 'дней'
-  const last = abs % 10
-  if (last === 1) return 'день'
-  if (last >= 2 && last <= 4) return 'дня'
-  return 'дней'
 }
 
 /* === MARK TODAY === */
@@ -501,7 +512,7 @@ document.getElementById('btnMark').addEventListener('click', async () => {
   if (!currentUser || !currentCompetition) return
   const btn = document.getElementById('btnMark')
   btn.disabled = true
-  btn.textContent = 'Сохранение…'
+  btn.textContent = t('btnMarkSaving')
 
   const todayStr = new Date().toISOString().slice(0, 10)
 
@@ -513,9 +524,9 @@ document.getElementById('btnMark').addEventListener('click', async () => {
   }, { onConflict: 'habit_id,user_id,completed_date' })
 
   if (error) {
-    btn.textContent = '✗ Ошибка'
+    btn.textContent = t('btnMarkError')
     btn.disabled = false
-    setTimeout(() => { btn.textContent = '✓ Отметить сегодня'; btn.disabled = false }, 2000)
+    setTimeout(() => { btn.textContent = t('btnMark'); btn.disabled = false }, 2000)
     return
   }
 
