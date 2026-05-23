@@ -104,34 +104,6 @@
           </div>
           <span class="mobile-app-arrow">→</span>
         </a>
-        <div class="mobile-app-locked">
-          <div class="mobile-app-info">
-            <div class="mobile-app-name">Aurora</div>
-            <div class="mobile-app-desc" data-i18n="auroraSub">сон · скоро</div>
-          </div>
-          <span class="badge-soon">soon</span>
-        </div>
-        <div class="mobile-app-locked">
-          <div class="mobile-app-info">
-            <div class="mobile-app-name">Focus</div>
-            <div class="mobile-app-desc" data-i18n="focusSub">концентрация · скоро</div>
-          </div>
-          <span class="badge-soon">soon</span>
-        </div>
-        <div class="mobile-app-locked">
-          <div class="mobile-app-info">
-            <div class="mobile-app-name">Agenda</div>
-            <div class="mobile-app-desc" data-i18n="agendaSub">планер · скоро</div>
-          </div>
-          <span class="badge-soon">soon</span>
-        </div>
-        <div class="mobile-app-locked">
-          <div class="mobile-app-info">
-            <div class="mobile-app-name">Note</div>
-            <div class="mobile-app-desc" data-i18n="noteSub">журнал · скоро</div>
-          </div>
-          <span class="badge-soon">soon</span>
-        </div>
       </div>
     </div>
   </div>
@@ -143,10 +115,6 @@
       <a href="#" class="nav-link active" data-i18n="navOverview">Обзор</a>
       <a href="#" class="nav-link" id="navDoubleDo">duo.</a>
       <a href="#" class="nav-link" id="navRead">read.</a>
-      <a href="#" class="nav-link locked">Aurora <span class="badge-soon">soon</span></a>
-      <a href="#" class="nav-link locked">Focus <span class="badge-soon">soon</span></a>
-      <a href="#" class="nav-link locked">Agenda <span class="badge-soon">soon</span></a>
-      <a href="#" class="nav-link locked">Note <span class="badge-soon">soon</span></a>
     </div>
     <div class="nav-actions">
       <button class="icon-btn lang-toggle" id="langToggle" aria-label="Switch language" title="Switch language">EN</button>
@@ -201,10 +169,6 @@
               <canvas id="sparklineCanvas" width="100" height="40"></canvas>
               <span class="sparkline-label">7 дней</span>
             </div>
-            <div class="streams-info">
-              <div class="streams-count">4 потока</div>
-              <div class="streams-status" data-i18n="streamsStatus">2 активны · 2 ждут<br/>запуска</div>
-            </div>
             <div class="streams-list">
               <div class="stream-item active">
                 <span class="stream-dot active"></span>
@@ -218,19 +182,9 @@
                 <span class="stream-score" id="streamReadScore">–</span>
                 <span class="stream-tag">READ.</span>
               </div>
-              <div class="stream-item locked">
-                <span class="stream-dot"></span>
-                <span class="stream-name">Sleep</span>
-                <span class="stream-locked-label" data-i18n="streamSoon">скоро</span>
-              </div>
-              <div class="stream-item locked">
-                <span class="stream-dot"></span>
-                <span class="stream-name">Focus</span>
-                <span class="stream-locked-label" data-i18n="streamSoon">скоро</span>
-              </div>
             </div>
             <div class="score-index-label">HI · INDEX · /100</div>
-            <div class="streams-live-label">● 2 / 4 streams live</div>
+            <div class="streams-live-label">● 2 streams live</div>
           </div>
         </div>
       </div>
@@ -370,22 +324,6 @@
           <div class="bc-name">read. <span class="badge-live">LIVE</span></div>
           <div class="bc-sub" id="bcReadSub">–</div>
         </div>
-      </div>
-      <div class="bottom-card locked-card">
-        <div class="bc-number">#3</div>
-        <div class="bc-content">
-          <div class="bc-name">Aurora</div>
-          <div class="bc-sub">sleep tracker</div>
-        </div>
-        <div class="bc-date muted">06 · 2026</div>
-      </div>
-      <div class="bottom-card locked-card">
-        <div class="bc-number">#4</div>
-        <div class="bc-content">
-          <div class="bc-name">Agenda</div>
-          <div class="bc-sub">calendar</div>
-        </div>
-        <div class="bc-date muted">07 · 2026</div>
       </div>
     </div>
   </main>

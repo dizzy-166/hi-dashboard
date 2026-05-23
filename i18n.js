@@ -90,14 +90,8 @@
       mobilePcNote:  'Дашборд доступен только на компьютере',
       ddAppDesc:     'соревнование · привычки',
       readAppDesc:   'книги · отзывы · дуэты',
-      auroraSub:     'сон · скоро',
-      focusSub:      'концентрация · скоро',
-      agendaSub:     'планер · скоро',
-      noteSub:       'журнал · скоро',
 
-      // Streams
-      streamsStatus: '2 активны · 2 ждут\nзапуска',
-      streamSoon:    'скоро',
+      // Lang
       langBtnLabel:  'EN',
 
       // read. widget
@@ -189,14 +183,8 @@
       mobilePcNote:  'Dashboard is available on desktop only',
       ddAppDesc:     'competition · habits',
       readAppDesc:   'books · reviews · duets',
-      auroraSub:     'sleep · coming soon',
-      focusSub:      'focus · coming soon',
-      agendaSub:     'planner · coming soon',
-      noteSub:       'journal · coming soon',
 
-      // Streams
-      streamsStatus: '2 active · 2 waiting\nto launch',
-      streamSoon:    'soon',
+      // Lang
       langBtnLabel:  'RU',
 
       // read. widget
