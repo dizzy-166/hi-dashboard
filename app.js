@@ -30,7 +30,10 @@ function updateNavLinks(session) {
   const mRd  = document.getElementById('mobileRead')
   if (mDD) mDD.href = `${APPS.doubledo}#${hash}`
   if (mRd) mRd.href = `${APPS.read}#${hash}`
-  // btn-open widget
+  // read. open button in widget
+  const readOpenBtn = document.getElementById('readOpenBtn')
+  if (readOpenBtn) readOpenBtn.href = `${APPS.read}#${hash}`
+  // btn-open widget (DoubleDo)
   const btnOpen = document.querySelector('.btn-open')
   if (btnOpen) btnOpen.dataset.url = `${APPS.doubledo}#${hash}`
 }
@@ -75,6 +78,8 @@ async function init() {
   ])
 
   updateNavLinks(session)
+
+  if (!isMobile()) loadReadData(session?.user ?? null)
 
   if (isMobile()) {
     await initMobile(session?.user ?? null)
@@ -647,6 +652,74 @@ function drawSparkline() {
   ctx.arc(last.x, last.y, 3, 0, Math.PI * 2)
   ctx.fillStyle = '#FF4D1C'
   ctx.fill()
+}
+
+/* === READ. DATA === */
+async function loadReadData(user) {
+  if (!user) return
+  try {
+    const [{ data: statsRows }, { data: readingBooks }] = await Promise.all([
+      sb.rpc('get_my_stats'),
+      sb.from('user_books')
+        .select('current_page, books(title, author, cover_id, cover_url, pages)')
+        .eq('user_id', user.id)
+        .eq('shelf', 'reading')
+        .order('updated_at', { ascending: false })
+        .limit(1),
+    ])
+
+    const stats   = statsRows?.[0]
+    const reading = readingBooks?.[0]
+
+    const finished = stats?.books_finished ?? 0
+    const pages    = stats?.pages_read    ?? 0
+    const reviews  = stats?.reviews_written ?? 0
+
+    document.getElementById('readStatFinished').textContent = finished
+    document.getElementById('readStatPages').textContent    = formatNum(pages)
+    document.getElementById('readStatReviews').textContent  = reviews
+
+    // Reading stream score: books finished × 5, cap 100
+    document.getElementById('streamReadScore').textContent = Math.min(finished * 5, 100)
+
+    // Bottom card sub-line
+    const bcSub = document.getElementById('bcReadSub')
+    if (bcSub) bcSub.textContent = t('readCardSub', finished, reviews)
+
+    // Currently reading book
+    const nowWrap = document.getElementById('readNowWrap')
+    const emptyEl = document.getElementById('readEmpty')
+
+    if (reading) {
+      const b   = reading.books
+      const pct = b.pages ? Math.round((reading.current_page / b.pages) * 100) : 0
+      const coverUrl = b.cover_id
+        ? `https://covers.openlibrary.org/b/id/${b.cover_id}-S.jpg`
+        : (b.cover_url ?? '')
+
+      document.getElementById('readNowTitle').textContent  = b.title  ?? ''
+      document.getElementById('readNowAuthor').textContent = b.author ?? ''
+      document.getElementById('readNowFill').style.width   = pct + '%'
+      document.getElementById('readNowPct').textContent    = pct + '%'
+      document.getElementById('readNowPages').textContent  = t('readPageLabel', reading.current_page ?? 0, b.pages ?? '?')
+
+      const img = document.getElementById('readNowCover')
+      if (coverUrl) { img.src = coverUrl; img.style.display = 'block' }
+
+      nowWrap.style.display = 'flex'
+      emptyEl.style.display = 'none'
+    } else {
+      nowWrap.style.display = 'none'
+      emptyEl.style.display = 'flex'
+    }
+  } catch (err) {
+    console.error('loadReadData:', err)
+  }
+}
+
+function formatNum(n) {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K'
+  return String(n)
 }
 
 init()

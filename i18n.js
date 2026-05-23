@@ -96,9 +96,19 @@
       noteSub:       'журнал · скоро',
 
       // Streams
-      streamsStatus: '1 активен · 3 ждут\nзапуска',
+      streamsStatus: '2 активны · 2 ждут\nзапуска',
       streamSoon:    'скоро',
       langBtnLabel:  'EN',
+
+      // read. widget
+      readTagNow:        'СЕЙЧАС',
+      readLoading:       'Загрузка…',
+      readNoBook:        'Сейчас ничего не читаешь',
+      readLabelFinished: 'прочитано',
+      readLabelPages:    'страниц',
+      readLabelReviews:  'отзывов',
+      readPageLabel:     (cur, tot) => `стр. ${cur} / ${tot}`,
+      readCardSub:       (fin, rev) => `${fin} кн. · ${rev} отзывов`,
     },
 
     en: {
@@ -185,9 +195,19 @@
       noteSub:       'journal · coming soon',
 
       // Streams
-      streamsStatus: '1 active · 3 waiting\nto launch',
+      streamsStatus: '2 active · 2 waiting\nto launch',
       streamSoon:    'soon',
       langBtnLabel:  'RU',
+
+      // read. widget
+      readTagNow:        'NOW',
+      readLoading:       'Loading…',
+      readNoBook:        'Nothing to read right now',
+      readLabelFinished: 'read',
+      readLabelPages:    'pages',
+      readLabelReviews:  'reviews',
+      readPageLabel:     (cur, tot) => `p. ${cur} / ${tot}`,
+      readCardSub:       (fin, rev) => `${fin} books · ${rev} reviews`,
     },
   }
 

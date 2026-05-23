@@ -727,6 +727,156 @@ body {
 }
 .bc-date.muted { color: #555; }
 
+/* === READ. WIDGET === */
+.read-card {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.read-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.read-body {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.read-now-wrap {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.read-now-cover {
+  width: 54px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.read-now-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.read-now-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.read-now-author {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.read-now-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.read-now-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.read-now-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.read-now-pct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+  min-width: 30px;
+  text-align: right;
+}
+
+.read-now-pages {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.read-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.read-stats {
+  display: flex;
+  align-items: center;
+  padding-left: 32px;
+  margin-left: 32px;
+  border-left: 1px solid var(--border);
+  gap: 28px;
+  flex-shrink: 0;
+}
+
+.read-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.read-stat-num {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text);
+  line-height: 1;
+}
+
+.read-stat-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.read-stat-sep {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+}
+
+.read-bc-icon {
+  background: var(--accent-soft);
+}
+
 /* === MOBILE SCREEN === */
 .mobile-screen {
   display: none;
