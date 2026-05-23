@@ -599,38 +599,6 @@ body {
 .heatmap-cell.miss { background: #E8E4DC; }
 .heatmap-cell.today { background: var(--accent); opacity: 0.4; }
 
-/* CTA */
-.dd-cta {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.btn-mark {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.btn-mark:hover { opacity: 0.9; }
-
-.btn-cheer {
-  background: none;
-  color: var(--text);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-.btn-cheer:hover { border-color: var(--text-muted); background: var(--bg); }
 
 /* === BOTTOM CARDS === */
 .bottom-cards {

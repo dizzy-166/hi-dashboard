@@ -449,15 +449,6 @@ function render({ me, rival, myStreak, rivalStreak, myScore, competition, dayNum
   rivalStatusEl.className = 'dd-status ' + (rivalDoneToday ? 'done' : 'none')
   rivalStatusEl.textContent = rivalDoneToday ? t('statusDone') : t('statusNone')
 
-  // Mark button state
-  const btnMark = document.getElementById('btnMark')
-  btnMark.disabled = myDoneToday
-  btnMark.textContent = myDoneToday ? t('btnMarkDone') : t('btnMark')
-  btnMark.style.opacity = myDoneToday ? '0.5' : '1'
-
-  // Cheer button
-  document.getElementById('btnCheer').textContent = t('btnCheer', rival.username)
-
   // HI score
   document.getElementById('scoreNumber').textContent = myScore
   document.getElementById('streamScore').textContent = myScore
@@ -510,32 +501,6 @@ function updateDateTime(username) {
   else if (h >= 22 || h < 5) greeting = t('goodNight')
   document.querySelector('.greeting').childNodes[0].textContent = `${greeting}, `
 }
-
-/* === MARK TODAY === */
-document.getElementById('btnMark').addEventListener('click', async () => {
-  if (!currentUser || !currentCompetition) return
-  const btn = document.getElementById('btnMark')
-  btn.disabled = true
-  btn.textContent = t('btnMarkSaving')
-
-  const todayStr = new Date().toISOString().slice(0, 10)
-
-  const { error } = await sb.from('habit_progress').upsert({
-    habit_id: currentCompetition.habit_id,
-    user_id: currentUser.id,
-    completed_date: todayStr,
-    is_completed: true,
-  }, { onConflict: 'habit_id,user_id,completed_date' })
-
-  if (error) {
-    btn.textContent = t('btnMarkError')
-    btn.disabled = false
-    setTimeout(() => { btn.textContent = t('btnMark'); btn.disabled = false }, 2000)
-    return
-  }
-
-  await loadDashboard(currentUser)
-})
 
 /* === HEATMAP === */
 function buildHeatmaps(competition, progress, myId, rivalId, dayNumber, todayStr) {
