@@ -27,6 +27,27 @@ function parseLocalDate(str) {
   return new Date(y, m - 1, d)
 }
 
+/** Calculates real streak from progress entries for a given user.
+ *  Walks back from the most recent done date, counting consecutive days. */
+function calcStreak(progressEntries, userId) {
+  const done = new Set(
+    progressEntries
+      .filter(p => p.user_id === userId && p.is_completed)
+      .map(p => p.completed_date)
+  )
+  if (done.size === 0) return 0
+
+  const sortedDesc = [...done].sort().reverse()
+  const start = parseLocalDate(sortedDesc[0])
+  let streak = 0
+  const d = new Date(start)
+  while (done.has(localDateStr(d))) {
+    streak++
+    d.setDate(d.getDate() - 1)
+  }
+  return streak
+}
+
 const APPS = {
   doubledo: 'https://doubledo.vercel.app',
   read: 'https://read-hi.vercel.app',
@@ -426,8 +447,6 @@ async function loadDashboard(user) {
     const me = isUser1 ? competition.user1 : competition.user2
     const rival = isUser1 ? competition.user2 : competition.user1
     if (!me || !rival) throw new Error('Participant data missing for competition ' + competition.id)
-    const myStreak = (isUser1 ? competition.user1_streak : competition.user2_streak) ?? 0
-    const rivalStreak = (isUser1 ? competition.user2_streak : competition.user1_streak) ?? 0
     const myScore = (isUser1 ? competition.user1_score : competition.user2_score) ?? 0
     const rivalId = isUser1 ? competition.user2_id : competition.user1_id
 
@@ -436,6 +455,10 @@ async function loadDashboard(user) {
 
     const myDoneToday = progress?.some(p => p.user_id === user.id && p.completed_date === todayStr && p.is_completed) ?? false
     const rivalDoneToday = progress?.some(p => p.user_id === rivalId && p.completed_date === todayStr && p.is_completed) ?? false
+
+    // Calculate streaks directly from progress data (DB field may be stale)
+    const myStreak = calcStreak(progress, user.id)
+    const rivalStreak = calcStreak(progress, rivalId)
 
     render({
       me, rival, myStreak, rivalStreak, myScore,
