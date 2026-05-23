@@ -11,6 +11,22 @@ let currentSession = null
 // Shorthand for current-language translate
 const t = (key, ...args) => HiLang.t(key, ...args)
 
+/** Returns local date as YYYY-MM-DD (avoids UTC-shift bugs with toISOString) */
+function localDateStr(d) {
+  d = d || new Date()
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, '0'),
+    String(d.getDate()).padStart(2, '0'),
+  ].join('-')
+}
+
+/** Parses YYYY-MM-DD as local midnight (avoids timezone shift from new Date(str)) */
+function parseLocalDate(str) {
+  const [y, m, d] = str.split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+
 const APPS = {
   doubledo: 'https://doubledo.vercel.app',
   read: 'https://read-hi.vercel.app',
@@ -371,8 +387,7 @@ async function loadDashboard(user) {
     currentCompetition = competition
 
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const todayStr = today.toISOString().slice(0, 10)
+    const todayStr = localDateStr(today)
 
     const [{ data: habit }, { data: users }, { data: progress }] = await Promise.all([
       sb.from('habits').select('title').eq('id', competition.habit_id).single(),
@@ -400,8 +415,8 @@ async function loadDashboard(user) {
     const myScore = (isUser1 ? competition.user1_score : competition.user2_score) ?? 0
     const rivalId = isUser1 ? competition.user2_id : competition.user1_id
 
-    const startDate = new Date(competition.start_date)
-    const dayNumber = Math.floor((today - startDate) / 86400000) + 1
+    const startDate = parseLocalDate(competition.start_date)
+    const dayNumber = Math.floor((parseLocalDate(todayStr) - startDate) / 86400000) + 1
 
     const myDoneToday = progress?.some(p => p.user_id === user.id && p.completed_date === todayStr && p.is_completed) ?? false
     const rivalDoneToday = progress?.some(p => p.user_id === rivalId && p.completed_date === todayStr && p.is_completed) ?? false
@@ -504,11 +519,11 @@ function updateDateTime(username) {
 
 /* === HEATMAP === */
 function buildHeatmaps(competition, progress, myId, rivalId, dayNumber, todayStr) {
-  const start = new Date(competition.start_date)
+  const start = parseLocalDate(competition.start_date)
   const dates = Array.from({ length: dayNumber }, (_, i) => {
     const d = new Date(start)
     d.setDate(d.getDate() + i)
-    return d.toISOString().slice(0, 10)
+    return localDateStr(d)
   })
 
   const myDone = new Set(progress?.filter(p => p.user_id === myId && p.is_completed).map(p => p.completed_date))
