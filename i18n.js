@@ -40,7 +40,7 @@
       // Parameterised
       series:    n  => `серия ${n}`,
       daysLabel: n  => `${n} ДНЕЙ`,
-      ddTag:     n  => `DOUBLEDO · СОРЕВНОВАНИЕ · ДЕНЬ `,
+      ddTag:     n  => `DUO. · СОРЕВНОВАНИЕ · ДЕНЬ `,
       ddTagComp: 'СОРЕВНОВАНИЕ',
       ddTagDay:  'ДЕНЬ',
       btnCheer:  r  => `→ Подбодрить ${r}`,
@@ -146,7 +146,7 @@
       // Parameterised
       series:    n  => `series ${n}`,
       daysLabel: n  => `${n} DAYS`,
-      ddTag:     n  => `DOUBLEDO · COMPETITION · DAY `,
+      ddTag:     n  => `DUO. · COMPETITION · DAY `,
       ddTagComp: 'COMPETITION',
       ddTagDay:  'DAY',
       btnCheer:  r  => `→ Cheer on ${r}`,

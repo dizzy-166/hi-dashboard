@@ -384,8 +384,8 @@ body {
   font-weight: 500;
 }
 
-/* === DOUBLEDO CARD === */
-.doubledo-card {
+/* === DUO. CARD === */
+.duo-card {
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
@@ -689,7 +689,7 @@ body {
   align-items: center;
   justify-content: center;
 }
-.doubledo-icon { background: var(--accent-soft); }
+.duo-icon { background: var(--accent-soft); }
 
 .bc-name {
   font-size: 14px;

@@ -33,7 +33,7 @@ function updateNavLinks(session) {
   // read. open button in widget
   const readOpenBtn = document.getElementById('readOpenBtn')
   if (readOpenBtn) readOpenBtn.href = `${APPS.read}#${hash}`
-  // btn-open widget (DoubleDo)
+  // btn-open widget (duo.)
   const btnOpen = document.querySelector('.btn-open')
   if (btnOpen) btnOpen.dataset.url = `${APPS.doubledo}#${hash}`
 }
@@ -420,7 +420,7 @@ async function loadDashboard(user) {
 function render({ me, rival, myStreak, rivalStreak, myScore, competition, dayNumber, progress, todayStr, myDoneToday, rivalDoneToday, userId, rivalId }) {
   updateDateTime(me.username)
 
-  // DoubleDo header
+  // duo. header
   document.getElementById('ddDay').textContent = dayNumber
   document.getElementById('ddHabitName').textContent = competition.habit.title
   document.getElementById('seriesLabel').textContent = t('series', dayNumber)
