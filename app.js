@@ -389,17 +389,33 @@ async function loadDashboard(user) {
     const today = new Date()
     const todayStr = localDateStr(today)
 
-    const [{ data: habit }, { data: users }, { data: progress }] = await Promise.all([
+    const [{ data: habit }, { data: users }, { data: members }] = await Promise.all([
       sb.from('habits').select('title').eq('id', competition.habit_id).single(),
       sb.from('users').select('id, username').in('id', [competition.user1_id, competition.user2_id]),
+      // Each participant owns their own habit copy — need their individual habit_id
+      sb.from('habit_members')
+        .select('user_id, habit_id')
+        .eq('competition_id', competition.id)
+        .eq('status', 'accepted'),
+    ])
+
+    // Map user_id → their personal habit_id; fall back to competition.habit_id if missing
+    const habitIdFor = Object.fromEntries((members || []).map(m => [m.user_id, m.habit_id]))
+    const u1HabitId = habitIdFor[competition.user1_id] || competition.habit_id
+    const u2HabitId = habitIdFor[competition.user2_id] || competition.habit_id
+
+    // Fetch progress for each user under their own habit_id
+    const [{ data: p1 }, { data: p2 }] = await Promise.all([
       sb.from('habit_progress')
         .select('user_id, completed_date, is_completed')
-        .eq('habit_id', competition.habit_id)
-        .in('user_id', [competition.user1_id, competition.user2_id])
-        .gte('completed_date', competition.start_date)
-        .lte('completed_date', todayStr)
-        .order('completed_date'),
+        .eq('habit_id', u1HabitId).eq('user_id', competition.user1_id)
+        .gte('completed_date', competition.start_date).lte('completed_date', todayStr),
+      sb.from('habit_progress')
+        .select('user_id, completed_date, is_completed')
+        .eq('habit_id', u2HabitId).eq('user_id', competition.user2_id)
+        .gte('completed_date', competition.start_date).lte('completed_date', todayStr),
     ])
+    const progress = [...(p1 || []), ...(p2 || [])]
 
     if (!habit) throw new Error('Habit not found for competition ' + competition.id)
     competition.habit = habit
